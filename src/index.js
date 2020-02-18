@@ -1,8 +1,11 @@
 const { ApolloServer, gql } = require('apollo-server-express');
 const express = require('express');
 const app = express();
+require('dotenv').config();
+const db = require('./db');
 
 const port = process.env.port || 4000;
+const DB_HOST = process.env.DB_HOST;
 
 let notes = [
   { id: '1', content: 'This is a note', author: 'Dave Carlson' },
@@ -45,6 +48,8 @@ const resolvers = {
     }
   }
 };
+//Connect to the mongoDB
+db.connect(DB_HOST);
 //Setup the Apollo server
 const server = new ApolloServer({ typeDefs, resolvers });
 //Apply the Appolo GraphQL middleware and set the path to /api
