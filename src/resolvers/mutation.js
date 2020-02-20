@@ -4,5 +4,13 @@ module.exports = {
       content: args.content,
       author: 'Dave Carlson'
     });
+  },
+  deleteNote: async (parent, { id }, { models }) => {
+    try {
+      await models.Note.findOneAndRemove({ _id: id });
+      return true;
+    } catch (err) {
+      return false;
+    }
   }
 };
