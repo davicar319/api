@@ -6,6 +6,7 @@ const db = require('./db');
 
 const port = process.env.port || 4000;
 const DB_HOST = process.env.DB_HOST;
+const models = require('./models');
 
 let notes = [
   { id: '1', content: 'This is a note', author: 'Dave Carlson' },
@@ -31,23 +32,25 @@ const typeDefs = gql`
 const resolvers = {
   Query: {
     hello: () => 'Hello World GraphQL',
-    notes: () => notes,
+    notes: () => {
+      return models.Note.find((err, notes) => {
+        return notes;
+      });
+    },
     note: (parent, args) => {
       return notes.find(note => note.id === args.id);
     }
   },
   Mutation: {
-    newNote: (parent, args) => {
-      let noteValue = {
-        id: String(notes.length + 1),
+    newNote: async (parent, args) => {
+      return await models.Note.create({
         content: args.content,
-        author: 'David A Carlson'
-      };
-      notes.push(noteValue);
-      return noteValue;
+        author: 'Dave Carlson'
+      });
     }
   }
 };
+
 //Connect to the mongoDB
 db.connect(DB_HOST);
 //Setup the Apollo server

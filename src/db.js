@@ -11,6 +11,7 @@ module.exports = {
     //Use the new server discovery and monitoring engine
     mongoose.set('useUnifiedTopology', true);
     //Connect to the DB
+    console.log(`Connecting to MongoDb...${DB_HOST}`);
     mongoose.connect(DB_HOST);
     //Log an error if we fail to connect.
     mongoose.connection.on('error', err => {
