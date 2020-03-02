@@ -22,7 +22,21 @@ module.exports = {
       author: mongoose.Types.ObjectId(user.id)
     });
   },
-  updateNote: async (parent, { content, id }, { models }) => {
+  updateNote: async (parent, { content, id }, { models, user }) => {
+    // If there is no user, throw an AuthenticationError.
+    if (!user) {
+      throw new AuthenticationError(authenticationErrorText);
+    }
+
+    //Find the note
+    const note = await models.Note.findById(id);
+    //If the note owner and current user do not match, throw a forbidden error.
+    if (note && String(note.author) != user.id) {
+      throw new ForbiddenError(
+        "You don't have permissions to delete that note."
+      );
+    }
+    //Update the note in the database and return the updated note.
     return await models.Note.findOneAndUpdate(
       {
         _id: id
