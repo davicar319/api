@@ -8,11 +8,13 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 const gravatar = require('../util/gravatar');
 
+const authenticationErrorText = 'You must be signed in to create a note';
+
 module.exports = {
   newNote: async (parent, args, { models, user }) => {
     // if there is no user on the context, throw an authentication error.
     if (!user) {
-      throw new AuthenticationError('You must be signed in to create a note.');
+      throw new AuthenticationError(authenticationErrorText);
     }
 
     return await models.Note.create({
@@ -35,11 +37,25 @@ module.exports = {
       }
     );
   },
-  deleteNote: async (parent, { id }, { models }) => {
+  deleteNote: async (parent, { id }, { models, user }) => {
+    if (!user) {
+      throw new AuthenticationError(authenticationErrorText);
+    }
+
+    const note = await models.Note.findById(id);
+    if (note && String(note.author) !== user.id) {
+      throw new ForbiddenError(
+        "You don't have permissions to delete that note."
+      );
+    }
+
     try {
-      await models.Note.findOneAndRemove({ _id: id });
+      if (note) {
+        await note.remove();
+      }
       return true;
     } catch (err) {
+      //If there is an error along the way, return false.
       return false;
     }
   },
