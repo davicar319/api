@@ -1,7 +1,9 @@
 const jwt = require('jsonwebtoken');
 const { ApolloServer } = require('apollo-server-express');
 const express = require('express');
+const helmet = require('helmet');
 const app = express();
+app.use(helmet());
 require('dotenv').config();
 const db = require('./db');
 const typeDefs = require('./schema');
