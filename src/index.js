@@ -1,4 +1,7 @@
 const jwt = require('jsonwebtoken');
+const depthLimit = require('graphql-depth-limit');
+const { createComplexityLimitRule } = require('graphql-validation-complexity');
+
 const { ApolloServer } = require('apollo-server-express');
 const express = require('express');
 const helmet = require('helmet');
@@ -34,11 +37,12 @@ db.connect(DB_HOST);
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: ({ req }) => {
+  validationRules: [depthLimit(5), createComplexityLimitRule(1000)],
+  context: async ({ req }) => {
     //Extract the jwt token from the headers.
     const token = req.headers.authorization;
     //Retrive the user from the token.
-    const user = getUser(token);
+    const user = await getUser(token);
     //Add the database models and user to the context.
     console.log(user);
     return { models, user };
