@@ -14,7 +14,6 @@ require('dotenv').config();
 const db = require('./db');
 const typeDefs = require('./schema');
 
-const port = process.env.port || 4000;
 const DB_HOST = process.env.DB_HOST;
 const models = require('./models');
 const resolvers = require('./resolvers');
@@ -52,6 +51,7 @@ const server = new ApolloServer({
 server.applyMiddleware({ app, path: '/api' });
 
 app.get('/', (req, res) => res.send('Hello World!!!'));
+const port = process.env.PORT || 4000;
 
 app.listen(port, () =>
   console.log(`Server running at http://localhost:${port}${server.graphqlPath}`)
